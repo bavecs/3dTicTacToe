@@ -1,10 +1,17 @@
-import { Inter } from 'next/font/google'
-
+"use client"
+import newRoom from 'tt/lib/newRoom'
 
 export default function Home() {
-  return (
 
-    <div className="w-full m-auto my-6 max-w-sm p-4 flex flex-col gap-3 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+  const newRoomHandler = () => {
+    const room = newRoom();
+
+    window.location.replace('./room/' + room);
+
+  }
+
+  return (<>
+
       <h5 className="text-xl font-medium text-gray-900 dark:text-white">Tic Tac Toe</h5>
 
       <div className='flex flex-col gap-4 md:flex-row'>
@@ -22,9 +29,9 @@ export default function Home() {
       <hr />
 
       <p className='text-sm text-gray-600'> OR create a new roow</p>
-      <button className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">New room</button>
+      <button onClick={newRoomHandler} className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">New room</button>
 
-    </div>
-
+      <a href="./allroom" className='text-blue-700 underline text-sm text-center'>All room</a>
+      </>
   )
 }

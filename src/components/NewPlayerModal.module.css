@@ -1,0 +1,19 @@
+.SymSelector {
+    @apply flex 
+}
+
+.SymSelector span {
+    @apply  bg-slate-200 py-3 px-5 rounded  cursor-pointer transition-all
+}
+
+.SymSelector span[data-selectable=true][data-selected=false]:hover {
+    @apply bg-slate-300
+}
+
+.SymSelector span[data-selectable=false] {
+    @apply  opacity-40 cursor-default 
+}
+
+.SymSelector span[data-selected=true] {
+    @apply bg-blue-700 text-white scale-105
+}
