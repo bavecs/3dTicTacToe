@@ -1,0 +1,7 @@
+.PlayerItem {
+    @apply flex gap-2 px-2 py-1 mx-2 items-center rounded
+}
+
+.PlayerItem[data-current=true] {
+    @apply bg-green-300
+}

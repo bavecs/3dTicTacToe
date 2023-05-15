@@ -1,40 +1,24 @@
 "use client"
-import { useEffect, useState } from "react"
-import Room from "tt/interfaces/Room.interface"
+import { Room } from "@prisma/client"
 
-import db from "tt/firebase/db"
-import { onValue, ref } from "@firebase/database"
+import useFetch from "tt/hooks/useFetch"
 
 export default function Rooms() {
-    const [rooms, setRooms] = useState<Array<Room>>([])
+    const { data, error } = useFetch<Room[]>('./api/room/')
 
 
-
-    useEffect(() => {
-        onValue(ref(db, "rooms"), (snapshot) => {
-
-
-            const data: Record<string, Room> = snapshot.val()
-
-            if (data === null) return
-            const dataArray = Object.entries(data).map(([key, value]) => ({
-                ...value,
-                id: String(key)
-            }))
-
-            setRooms(dataArray)
-        })
-    }, [])
-
-
-    if (!rooms.length) return <h1>Loading...</h1>
+    if (error) {
+        console.log(error)
+        return <p>There is an error.</p>
+    }
+    if (!data) return <p>Loading...</p>
 
     return <>
         <h1 className="text-md font-bold text-center">Rooms</h1>
         {
-            rooms.map(room => <a href={"./room/" + room.id} key={room.id} className="flex p-2 justify-between border-b border-gray-300">
+            data.map(room => <a href={"./room/" + room.id} key={room.id} className="flex p-2 justify-between border-b border-gray-300">
                 <span>{room.id} {room.isFull && "- Full"}</span>
-                <span>{new Date(room.last_activeDate).toLocaleDateString("HU")}</span>
+                <span>{new Date(room.activeAt).toLocaleDateString("HU")}</span>
                 
             </a>)
         }

@@ -3,18 +3,12 @@ import Player, { PlayerWSymbol } from 'tt/interfaces/Player.interface';
 import { uid } from 'uid';
 
 import Style from "./NewPlayerModal.module.css"
+import { SymbolType } from 'tt/app/room/[id]/page';
 
-export default function NewPlayerModal({onSave, initPlayer}: {onSave: (p: PlayerWSymbol) => void, initPlayer: Player}) {
+export default function SymSelector({onSave, initPlayer}: {onSave: (p: Player, sym?: SymbolType) => void, initPlayer: Player}) {
 
-    const [player, setPlayer] = useState<PlayerWSymbol>({
-        ...initPlayer,
-        sym: null
-    });
+    const [sym, setSym] = useState<SymbolType>(null)
 
-
-    const selectSymbol = (sym: "x" | "o") => {
-        setPlayer({...player, sym: sym})
-    }
 
 
     return <>
@@ -26,14 +20,14 @@ export default function NewPlayerModal({onSave, initPlayer}: {onSave: (p: Player
                     <div className='mb-2'>
                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select symbol</label>
                         <div className={Style.SymSelector}>
-                            <span data-selected={player.sym === "o"} data-selectable={true} onClick={() => selectSymbol("o")}>O</span>
-                            <span data-selected={player.sym === "x"} data-selectable={true} onClick={() => selectSymbol("x")}>X</span>
+                            <span data-selected={sym === "o"} data-selectable={true} onClick={() => setSym("o")}>O</span>
+                            <span data-selected={sym === "x"} data-selectable={true} onClick={() => setSym("x")}>X</span>
                         </div>
                     </div>
                     
 
 
-                    <button onClick={() => onSave(player)} className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button>
+                    <button onClick={() => onSave(initPlayer, sym)} className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button>
 
                 </div>
 
