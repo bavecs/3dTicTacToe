@@ -1,7 +1,70 @@
-.PlayerItem {
-    @apply flex gap-2 px-2 py-1 mx-2 items-center rounded
+.Header {
+    @apply bg-white border-b border-slate-200 p-1 px-3 flex justify-between shadow-sm fixed top-0 left-0 right-0 w-full
 }
 
-.PlayerItem[data-current=true] {
-    @apply bg-green-300
+
+.ResultIndicator {
+    @apply flex flex-col py-1 mx-2 items-center rounded pl-1 px-3 text-gray-800 relative 
+}
+
+.ResultIndicator[data-player] {
+    @apply gap-3 flex-row 
+}
+
+.ResultIndicator:first-child {
+    @apply flex-row-reverse text-right pr-1 pl-3
+}
+
+.ResultIndicator[data-player]:first-child b {
+    right: 0;
+    left:auto
+}
+
+.ResultIndicator[data-player] b {
+    color: transparent;  
+    text-shadow: 0 0 0 rgb(31, 41, 55);
+    font-size: 8px;
+    position: absolute;
+    height: 16px;
+    line-height: 1.7;
+    width: 15px;
+    text-align: center;
+    border-radius: 5px;
+    bottom: 0;
+    left: 0;
+    background: white;
+    opacity: 0;
+}
+
+
+.ResultIndicator[data-current=true] {
+    @apply bg-blue-100 text-blue-800 
+}
+
+.ResultIndicator[data-current=true] b {
+    text-shadow: 0 0 0 rgb(30, 64, 175);
+    background: #dbeafe;
+    opacity: 1;
+
+}
+
+.ResultIndicator[data-player=true][data-current=true] b {
+    text-shadow: 0 0 0 rgb(22, 101, 52);
+    @apply bg-green-200
+}
+
+.ResultIndicator[data-player=true][data-current=true] {
+    @apply bg-green-200 text-green-800 
+}
+
+.ResultIndicator, .PlayerIndicatorOpp { 
+    @apply text-xs  leading-none 
+}
+
+.PlayerIndicatorOpp {
+
+}
+
+.WinCount {
+    @apply font-bold text-base shadow-inner p-1 h-8 w-8 flex items-center justify-center rounded bg-white/80
 }

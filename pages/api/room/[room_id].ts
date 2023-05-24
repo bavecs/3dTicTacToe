@@ -1,82 +1,84 @@
-import { Players } from "@/interfaces/Player.interface"
+import Player, { Players } from "@/interfaces/Player.interface"
 import { Server, Socket } from "socket.io"
 
 import { Symbol } from "@/interfaces/Symbol.enum"
 import { Client, Clients, oppositSymbol, unmatchedPlayer } from "@/lib/roomUtils"
-
-
+import {Cells} from "@/lib/Board.class"
 
 
 
 export default function SocketHandler(req: any, res: any) {
     const room_id = req.query.room_id
     let players: Clients = {}
-    let clients: {
-        [k: string]: Socket
-    } = {}
-    let unmatched: string | null = null
+
     let IO = res.socket.server.io || new Server(res.socket.server)
 
-    let currentSymbol: Symbol
-
-    const addClient = (socket: Socket) => {
-        console.log("New client connected", socket.id);
-        clients[socket.id] = socket;
-    };
-    const removeClient = (socket: Socket) => {
-        delete clients[socket.id]
-    };
-
-
+    let currentSymbol: Symbol = Symbol.X
 
 
     IO.on("connection", (socket: Socket) => {
 
         let id = socket.id
-
-        addClient(socket)
-
+        
         const playerName = socket.handshake.headers["player-name"] as string;
-        const playerSymbol = socket.handshake.headers["player-symbol"] as Symbol;
-        joinGame(socket, playerName, playerSymbol)
+        joinGame(socket, playerName, Symbol.X)
 
 
         const opponent = getOpponent(socket)
         if (opponent) {
+ 
 
             currentSymbol = Symbol.X
+            const player = players[id]
+            
 
-            const msg: Players = {
-                [players[socket.id].symbol]: {
-                    name: players[socket.id].name,
-                    symbol: players[socket.id].symbol,
-                    socketId: socket.id
+            const playersClient: Players = {
+                [player.symbol]: {
+                    name: player.name,
+                    symbol: player.symbol,
+                    socketId: socket.id,
+                    wins: 0
                 },
                 [opponent.symbol]: {
                     name: opponent.name,
                     symbol: opponent.symbol,
-                    socketId: opponent.socket.id
+                    socketId: opponent.socket.id,
+                    wins: 0
                 }
 
             }
 
-            socket.emit("game.begin", msg);
-            opponent.socket.emit("game.begin", msg)
+            socket.emit("game.begin", {players: playersClient, symbol: player.symbol});
+            opponent.socket.emit("game.begin", {players: playersClient, symbol: opponent.symbol})
+
+
+
         }
 
+        socket.on("game.move", (msg: {cells: Cells, nextSymbol: Symbol}) => {
+            currentSymbol = msg.nextSymbol
+            socket.broadcast.emit("game.boardUpdate", {cells: msg.cells, currentSymbol: currentSymbol});
+        })
+
+        socket.on("game.win", msg => {
+            socket.broadcast.emit("game.opponentWon", msg);
+        })
+
+        socket.on("game.new", () => {
+            socket.broadcast.emit("game.requestNew");
+        })
 
 
         socket.on("disconnect", () => {
-            console.log("disconnect: " + socket.id)
-            removeClient(socket);
+            console.log("disconnect: " + id)
+            const disconnectedPlayer = players[id]
             leaveGame(socket)
-            socket.broadcast.emit("clientdisconnect");
-            const opponent = getOpponent(socket)
-            if (opponent) {
-                unmatched = opponent.socket.id
-                opponent.socket.emit("opponent.left", opponent.symbol);
-            }
+
+            socket.broadcast.emit("opponent.left", {msg: disconnectedPlayer.symbol});
+            
         });
+
+
     })
 
 
@@ -88,7 +90,10 @@ export default function SocketHandler(req: any, res: any) {
     const joinGame = (socket: Socket, name: string, symbol: Symbol) => {
 
 
+
         let opponentPlayer = unmatchedPlayer(players)
+
+        console.log(!opponentPlayer ? symbol : oppositSymbol(opponentPlayer.symbol))
 
         let newPlayer: Client = {
             opponent: opponentPlayer?.socket.id || null,
@@ -103,9 +108,7 @@ export default function SocketHandler(req: any, res: any) {
         }
 
 
-        players = {
-            ...players, [socket.id]: newPlayer
-        }
+        players[socket.id] = newPlayer
 
         console.log(players)
 
